@@ -24,4 +24,6 @@ jobs:
           python -m playwright install
 
       - name: Run tests
+        env:
+          PYTHONPATH: .
         run: pytest -v
