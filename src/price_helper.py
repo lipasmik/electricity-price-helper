@@ -7,6 +7,9 @@ class ElectricityPriceHelper:
 
     PRICE_ENDPOINT = "https://api.porssisahko.net/v2/latest-prices.json"
 
+    def current_time(self):
+        return datetime.now(timezone.utc)
+
     def fetch_prices(self):
         response = requests.get(self.PRICE_ENDPOINT, timeout=10)
         response.raise_for_status()
@@ -16,7 +19,7 @@ class ElectricityPriceHelper:
         return min(prices, key=lambda h: h["price"])
 
     def find_hours_under_limit(self, prices, limit):
-        now = datetime.now(timezone.utc)
+        now = self.current_time()
 
         return sorted(
             [
@@ -28,7 +31,7 @@ class ElectricityPriceHelper:
         )
 
     def find_hours_over_limit(self, prices, limit):
-        now = datetime.now(timezone.utc)
+        now = self.current_time()
 
         return sorted(
             [

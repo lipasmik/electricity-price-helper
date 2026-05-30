@@ -23,7 +23,12 @@ jobs:
           pip install -r requirements.txt
           python -m playwright install
 
-      - name: Run tests
+      - name: Run unit tests
         env:
           PYTHONPATH: .
-        run: pytest -v
+        run: pytest tests/test_price_helper.py -v
+
+      - name: Run E2E/API tests
+        env:
+          PYTHONPATH: .
+        run: pytest tests/test_e2e_price_flow.py -v
