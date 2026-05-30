@@ -15,9 +15,6 @@ class ElectricityPriceHelper:
         response.raise_for_status()
         return response.json()["prices"]
 
-    def find_cheapest(self, prices):
-        return min(prices, key=lambda h: h["price"])
-
     def find_hours_under_limit(self, prices, limit):
         now = self.current_time()
 
@@ -54,7 +51,7 @@ class ElectricityPriceHelper:
 
     def print_hours(self, title, hours):
         if not hours:
-            print(f"{title} Ei osumia.")
+            print(f"{title} no matching hours.")
             return
 
         print(title)

@@ -2,15 +2,12 @@ from playwright.sync_api import sync_playwright
 from src.price_helper import ElectricityPriceHelper
 
 
-PRICE_ENDPOINT = "https://api.porssisahko.net/v2/latest-prices.json"
-
-
 def test_real_life_price_monitoring_flow():
     helper = ElectricityPriceHelper()
 
     with sync_playwright() as p:
         api = p.request.new_context()
-        response = api.get(PRICE_ENDPOINT)
+        response = api.get(ElectricityPriceHelper.PRICE_ENDPOINT)
 
         assert response.ok
 

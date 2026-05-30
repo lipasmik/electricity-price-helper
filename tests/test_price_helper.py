@@ -26,14 +26,6 @@ def sample_prices():
     ]
 
 
-def test_find_cheapest():
-    helper = ElectricityPriceHelper()
-
-    cheapest = helper.find_cheapest(sample_prices())
-
-    assert cheapest["price"] == 4.999
-
-
 def test_under_limit_boundary():
     helper = ElectricityPriceHelper()
 
@@ -86,3 +78,25 @@ def test_format_time():
     )
 
     assert formatted == "15.06 12:34"
+
+
+def test_print_hours_empty(capsys):
+    helper = ElectricityPriceHelper()
+
+    helper.print_hours("Good time to heat the sauna:", [])
+
+    assert "no matching hours." in capsys.readouterr().out
+
+
+def test_print_hours_formats_output(capsys):
+    helper = ElectricityPriceHelper()
+
+    helper.print_hours(
+        "Good time to heat the sauna:",
+        [make_price(1, 4.5)]
+    )
+
+    out = capsys.readouterr().out
+
+    assert "Good time to heat the sauna:" in out
+    assert "4.5 c/kWh" in out
