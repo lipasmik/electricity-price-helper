@@ -91,12 +91,12 @@ def main():
     prices = helper.fetch_prices()
 
     helper.print_hours(
-        "Sauna päälle näihin aikoihin:",
+        "Good time to heat the sauna:",
         helper.find_hours_under_limit(prices, args.under)
     )
 
     helper.print_hours(
-        "HUOM! Sähkön hinta korkea lähiaikoina!",
+        "High electricity prices expected:",
         helper.find_hours_over_limit(prices, args.over)
     )
 
