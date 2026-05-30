@@ -1,1 +1,2 @@
-requirements here
+requests
+pytest

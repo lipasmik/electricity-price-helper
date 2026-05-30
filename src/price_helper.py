@@ -81,7 +81,7 @@ def main():
     parser.add_argument(
         "--over",
         type=float,
-        default=15,
+        default=10,
         help="Show hours over this price"
     )
 
