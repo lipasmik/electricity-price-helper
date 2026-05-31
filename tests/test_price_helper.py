@@ -80,7 +80,7 @@ def test_format_time() -> None:
         "2025-06-15T12:34:00.000000+0000"
     )
 
-    assert formatted == "15.06 12:34"
+    assert formatted == "15.06 15:34"
 
 
 def test_print_hours_empty(capsys: pytest.CaptureFixture[str]) -> None:

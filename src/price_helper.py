@@ -1,5 +1,6 @@
 import argparse
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 import requests
 
 
@@ -46,8 +47,9 @@ class ElectricityPriceHelper:
         )
 
     def format_time(self, value: str) -> str:
-        dt = self.parse_datetime(value)
-        return dt.strftime("%d.%m %H:%M")
+        utc_dt = self.parse_datetime(value)
+        finnish_dt = utc_dt.astimezone(ZoneInfo("Europe/Helsinki"))
+        return finnish_dt.strftime("%d.%m %H:%M")
 
     def print_hours(self, title: str, hours: list[dict]) -> None:
         if not hours:
