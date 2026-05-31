@@ -7,15 +7,15 @@ class ElectricityPriceHelper:
 
     PRICE_ENDPOINT = "https://api.porssisahko.net/v2/latest-prices.json"
 
-    def current_time(self):
+    def current_time(self) -> datetime:
         return datetime.now(timezone.utc)
 
-    def fetch_prices(self):
+    def fetch_prices(self) -> list[dict]:
         response = requests.get(self.PRICE_ENDPOINT, timeout=10)
         response.raise_for_status()
         return response.json()["prices"]
 
-    def find_hours_under_limit(self, prices, limit):
+    def find_hours_under_limit(self, prices: list[dict], limit: float) -> list[dict]:
         now = self.current_time()
 
         return sorted(
@@ -27,7 +27,7 @@ class ElectricityPriceHelper:
             key=lambda h: h["startDate"]
         )
 
-    def find_hours_over_limit(self, prices, limit):
+    def find_hours_over_limit(self, prices: list[dict], limit: float) -> list[dict]:
         now = self.current_time()
 
         return sorted(
@@ -39,17 +39,17 @@ class ElectricityPriceHelper:
             key=lambda h: h["startDate"]
         )
 
-    def parse_datetime(self, value):
+    def parse_datetime(self, value: str) -> datetime:
         return datetime.strptime(
             value,
             "%Y-%m-%dT%H:%M:%S.%f%z"
         )
 
-    def format_time(self, value):
+    def format_time(self, value: str) -> str:
         dt = self.parse_datetime(value)
         return dt.strftime("%d.%m %H:%M")
 
-    def print_hours(self, title, hours):
+    def print_hours(self, title: str, hours: list[dict]) -> None:
         if not hours:
             print(f"{title} no matching hours.")
             return
@@ -66,7 +66,7 @@ class ElectricityPriceHelper:
             )
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Electricity price helper"
     )
@@ -86,6 +86,9 @@ def main():
     )
 
     args = parser.parse_args()
+
+    if args.over <= args.under:
+        parser.error("--over price threshold must be greater than --under")
 
     helper = ElectricityPriceHelper()
     prices = helper.fetch_prices()

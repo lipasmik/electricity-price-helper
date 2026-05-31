@@ -1,26 +1,15 @@
+import subprocess
+import sys
 from playwright.sync_api import sync_playwright
 from src.price_helper import ElectricityPriceHelper
 
 
-def test_real_life_price_monitoring_flow():
-    helper = ElectricityPriceHelper()
-
-    with sync_playwright() as p:
-        api = p.request.new_context()
-        response = api.get(ElectricityPriceHelper.PRICE_ENDPOINT)
-
-        assert response.ok
-
-        data = response.json()
-        api.dispose()
-
-    prices = data["prices"]
-
-    assert len(prices) > 0
-
-    low_limit = 5
-    high_limit = 10
-
+def verify_price_limits(
+    helper: ElectricityPriceHelper,
+    prices: list,
+    low_limit: float,
+    high_limit: float,
+) -> None:
     low_hours = helper.find_hours_under_limit(prices, low_limit)
     high_hours = helper.find_hours_over_limit(prices, high_limit)
 
@@ -37,7 +26,35 @@ def test_real_life_price_monitoring_flow():
         ]
 
         assert len(future_prices) > 0
-        assert all(
-            low_limit < hour["price"] < high_limit
-            for hour in future_prices
+        assert all(low_limit < hour["price"] < high_limit for hour in future_prices)
+
+
+def test_real_life_price_monitoring_flow() -> None:
+    helper = ElectricityPriceHelper()
+
+    with sync_playwright() as p:
+        api = p.request.new_context()
+        response = api.get(ElectricityPriceHelper.PRICE_ENDPOINT)
+
+        assert response.ok
+
+        data = response.json()
+        api.dispose()
+
+    prices = data["prices"]
+
+    assert len(prices) > 0
+
+    verify_price_limits(helper, prices, low_limit=5, high_limit=10)
+
+
+def test_invalid_thresholds_show_error() -> None:
+    for over, under in [("5", "10"), ("10", "10")]:
+        result = subprocess.run(
+            [sys.executable, "-m", "src.price_helper", "--over", over, "--under", under],
+            capture_output=True,
+            text=True,
         )
+
+        assert result.returncode == 2
+        assert "--over price threshold must be greater than --under" in result.stderr
