@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import pytest
 from playwright.sync_api import sync_playwright
 from src.price_helper import ElectricityPriceHelper
 
@@ -13,11 +14,8 @@ def verify_price_limits(
     low_hours = helper.find_hours_under_limit(prices, low_limit)
     high_hours = helper.find_hours_over_limit(prices, high_limit)
 
-    if low_hours:
-        assert all(hour["price"] <= low_limit for hour in low_hours)
-
-    if high_hours:
-        assert all(hour["price"] >= high_limit for hour in high_hours)
+    assert all(hour["price"] <= low_limit for hour in low_hours)
+    assert all(hour["price"] >= high_limit for hour in high_hours)
 
     if not low_hours and not high_hours:
         future_prices = [
@@ -25,7 +23,6 @@ def verify_price_limits(
             if helper.parse_datetime(hour["startDate"]) > helper.current_time()
         ]
 
-        assert len(future_prices) > 0
         assert all(low_limit < hour["price"] < high_limit for hour in future_prices)
 
 
@@ -48,13 +45,13 @@ def test_real_life_price_monitoring_flow() -> None:
     verify_price_limits(helper, prices, low_limit=5, high_limit=10)
 
 
-def test_invalid_thresholds_show_error() -> None:
-    for over, under in [("5", "10"), ("10", "10")]:
-        result = subprocess.run(
-            [sys.executable, "-m", "src.price_helper", "--over", over, "--under", under],
-            capture_output=True,
-            text=True,
-        )
+@pytest.mark.parametrize("over,under", [("5", "10"), ("10", "10")])
+def test_invalid_thresholds_show_error(over: str, under: str) -> None:
+    result = subprocess.run(
+        [sys.executable, "-m", "src.price_helper", "--over", over, "--under", under],
+        capture_output=True,
+        text=True,
+    )
 
-        assert result.returncode == 2
-        assert "--over price threshold must be greater than --under" in result.stderr
+    assert result.returncode == 2
+    assert "--over price threshold must be greater than --under" in result.stderr
