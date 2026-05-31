@@ -26,9 +26,24 @@ jobs:
       - name: Run unit tests
         env:
           PYTHONPATH: .
-        run: pytest tests/test_price_helper.py -v
+        run: |
+          mkdir -p reports
+          pytest tests/test_price_helper.py -v \
+            --html=reports/unit-test-report.html \
+            --self-contained-html
 
       - name: Run E2E/API tests
         env:
           PYTHONPATH: .
-        run: pytest tests/test_e2e_price_flow.py -v
+        run: |
+          mkdir -p reports
+          pytest tests/test_e2e_price_flow.py -v \
+            --html=reports/e2e-test-report.html \
+            --self-contained-html
+
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports
+          path: reports/
