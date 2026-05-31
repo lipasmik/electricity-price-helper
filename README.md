@@ -4,21 +4,20 @@ A small Python program for monitoring future electricity prices using the Pörss
 
 The project demonstrates a lightweight automation and testing approach, including:
 
-* Configurable price thresholds
-* Filtering future electricity prices
-* Unit testing with pytest
-* API validation using Playwright
-* Automated test execution with GitHub Actions
+- Configurable price thresholds
+- Filtering future electricity prices
+- Unit testing with pytest
+- API validation using Playwright
+- Automated test execution with GitHub Actions
 
 ## Features
 
 The application can:
 
-* Fetch latest electricity prices from the Pörssisähkö API
-* Display future hours below a configurable price limit
-* Display future hours above a configurable price limit
-* Format output in a user-friendly way
-* Filter out past hours
+- Fetch latest electricity prices from the Pörssisähkö API
+- Display future hours below a configurable price limit
+- Display future hours above a configurable price limit
+- Format output in a user-friendly way
 
 Example output:
 
@@ -38,7 +37,7 @@ src/
 
 tests/
   test_price_helper.py
-  test_api_playwright.py
+  test_e2e_price_flow.py
 
 .github/workflows/
   tests.yml
@@ -80,10 +79,10 @@ python src/price_helper.py --under 5 --over 10
 
 Arguments:
 
-* `--under`
+- `--under`
   Show future hours below this price threshold
 
-* `--over`
+- `--over`
   Show future hours above this price threshold
 
 ## Running Tests
@@ -94,20 +93,32 @@ Run all tests:
 pytest -v
 ```
 
-The project includes:
+Generate HTML test reports:
 
-* Unit tests for filtering and formatting logic
-* Boundary value tests
-* Playwright API smoke tests against the live endpoint
+```bash
+pytest -v --html=reports/test-report.html --self-contained-html
+```
+
+The tests include:
+
+- Unit tests for filtering and formatting logic
+- Boundary value tests
+- Playwright API tests against the live endpoint
 
 ## Continuous Integration
 
 Tests are automatically executed using GitHub Actions on every push and pull request.
 
+The CI pipeline:
+
+- Runs unit tests and E2E tests separately
+- Generates HTML test reports
+- Uploads reports as build artifacts
+
 ## Future Improvements
 
 Possible future enhancements could include:
 
-* Scheduled execution using GitHub Actions
-* Email notifications for price alerts
-* Docker containerization
+- Scheduled execution using GitHub Actions
+- Email notifications for price alerts
+- Docker containerization
