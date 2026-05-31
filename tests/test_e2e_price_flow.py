@@ -5,27 +5,6 @@ from playwright.sync_api import sync_playwright
 from src.price_helper import ElectricityPriceHelper
 
 
-def verify_price_limits(
-    helper: ElectricityPriceHelper,
-    prices: list,
-    low_limit: float,
-    high_limit: float,
-) -> None:
-    low_hours = helper.find_hours_under_limit(prices, low_limit)
-    high_hours = helper.find_hours_over_limit(prices, high_limit)
-
-    assert all(hour["price"] <= low_limit for hour in low_hours)
-    assert all(hour["price"] >= high_limit for hour in high_hours)
-
-    if not low_hours and not high_hours:
-        future_prices = [
-            hour for hour in prices
-            if helper.parse_datetime(hour["startDate"]) > helper.current_time()
-        ]
-
-        assert all(low_limit < hour["price"] < high_limit for hour in future_prices)
-
-
 def test_real_life_price_monitoring_flow() -> None:
     helper = ElectricityPriceHelper()
 
@@ -55,3 +34,24 @@ def test_invalid_thresholds_show_error(over: str, under: str) -> None:
 
     assert result.returncode == 2
     assert "--over price threshold must be greater than --under" in result.stderr
+
+
+def verify_price_limits(
+    helper: ElectricityPriceHelper,
+    prices: list,
+    low_limit: float,
+    high_limit: float,
+) -> None:
+    low_hours = helper.find_hours_under_limit(prices, low_limit)
+    high_hours = helper.find_hours_over_limit(prices, high_limit)
+
+    assert all(hour["price"] <= low_limit for hour in low_hours)
+    assert all(hour["price"] >= high_limit for hour in high_hours)
+
+    if not low_hours and not high_hours:
+        future_prices = [
+            hour for hour in prices
+            if helper.parse_datetime(hour["startDate"]) > helper.current_time()
+        ]
+
+        assert all(low_limit < hour["price"] < high_limit for hour in future_prices)
